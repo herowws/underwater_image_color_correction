@@ -9,6 +9,7 @@ class UnderwaterImageColorCorrection {
     required Uint8List pixels,
     required double width,
     required double height,
+    double intensity = 1.0, // 新添加的强度参数，默认值为1.0
   }) {
     // Magic values:
     final double _numOfPixels = width * height;
@@ -93,18 +94,18 @@ class UnderwaterImageColorCorrection {
     // Make _histogram:
     var _shifted = _hueShiftRed(1, 1, 1, _hueShift);
 
-    final double _redGain = 256 / (_adjust['r']['high'] - _adjust['r']['low']);
-    final double _greenGain =
-        256 / (_adjust['g']['high'] - _adjust['g']['low']);
-    final double _blueGain = 256 / (_adjust['b']['high'] - _adjust['b']['low']);
+    final double _redGain = 256 / (_adjust['r']['high'] - _adjust['r']['low']) * intensity;
+    final double _greenGain = 256 / (_adjust['g']['high'] - _adjust['g']['low']) * intensity;
+    final double _blueGain = 256 / (_adjust['b']['high'] - _adjust['b']['low']) * intensity;
 
     final double _redOffset = (-_adjust['r']['low'] / 256) * _redGain;
     final double _greenOffset = (-_adjust['g']['low'] / 256) * _greenGain;
     final double _blueOffset = (-_adjust['b']['low'] / 256) * _blueGain;
 
-    final double _adjstRed = _shifted['r'] * _redGain;
-    final double _adjstRedGreen = _shifted['g'] * _redGain;
-    final double _adjstRedBlue = _shifted['b'] * _redGain * _blueMagicValue;
+    final double _adjstRed = _shifted['r'] * _redGain * intensity;
+    final double _adjstRedGreen = _shifted['g'] * _redGain * intensity;
+    final double _adjstRedBlue = _shifted['b'] * _redGain * _blueMagicValue * intensity;
+
 
     return ColorFilter.matrix(<double>[
       _adjstRed,
